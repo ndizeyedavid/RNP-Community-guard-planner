@@ -2,5 +2,4 @@
 <i>Copyright is subjected to prohibit the use of this project before it's release</i>
 
 <h1> </h1>
-More details soon, just know this is the first version with front end only, more will be updated soon
-Care to support if you may😊
+now, i'm on the backend of this beatiful project, soon it will completed, i estimate like 3 days remaining from today
