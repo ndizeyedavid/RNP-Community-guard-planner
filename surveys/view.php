@@ -1,3 +1,7 @@
+<?php
+include "../php/connect.php";
+include "../php/token.php";
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -65,7 +69,7 @@
     </style>
 </head>
 
-<body style="overflow: hidden;background-color: var(--primary_dk);">
+<body style="overflow: hidden;background-color: var(--primary_dk);" onload="preloader()">
     <section class="body-cont" style="overflow-y: auto;">
 
         <div class="top-cont">
@@ -114,6 +118,10 @@
 
         </div>
     </section>
+    <div class="preloader-cont">
+        <div class="preloader"></div>
+    </div>
+    <script src="../assets/js/main.js"></script>
 </body>
 
 </html>

@@ -1,3 +1,25 @@
+<?php
+include "../php/connect.php";
+include "../php/token.php";
+$id = $_GET['id'];
+$fetch = mysqli_query($con, "SELECT crime_report.id, users.nid, users.fname, users.lname, users.phone, users.email, users.province, crime_report.crime_date, crime_report.district, crime_report.crime_type, crime_report.description, crime_report.other_information FROM crime_report INNER JOIN users ON crime_report.userId = users.uid WHERE crime_report.id='{$id}'");
+$data = mysqli_fetch_array($fetch);
+
+// user details
+$nid = $data['nid'];
+$names = $data['fname'] . ' ' . $data['lname'];
+$email = $data['email'];
+$phone = $data['phone'];
+$province = $data['province'];
+$district = $data['district'];
+
+// crime details
+$title = $data['crime_type'];
+$date = $data['crime_date'];
+
+$description = $data['description'];
+$information = $data['other_information'];
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -64,10 +86,18 @@
             font-weight: 700;
             color: var(--success);
         }
+
+        @media print {
+
+            button,
+            .btn {
+                visibility: hidden;
+            }
+        }
     </style>
 </head>
 
-<body style="overflow: hidden;background-color: var(--primary_dk);">
+<body style="overflow: hidden;background-color: var(--primary_dk);" onload="preloader()">
     <section class="body-cont" style="overflow-y: auto; padding: 10px 50px;">
 
         <div class="top-cont">
@@ -80,21 +110,21 @@
             <h3>User Information</h3>
             <table>
                 <tr>
-                    <td><b>National ID</b>: 12345678987654323423</td>
-                    <td><b>Province</b>: Kigali City</td>
+                    <td><b>National ID</b>: <?php echo $nid; ?></td>
+                    <td><b>Province</b>: <?php echo $province; ?></td>
                 </tr>
 
                 <tr>
-                    <td><b>Names</b>: Mellow Junior</td>
-                    <td><b>District</b>: Bugesera</td>
+                    <td><b>Names</b>: <?php echo $names; ?></td>
+                    <td><b>District</b>: <?php echo $district; ?></td>
                 </tr>
 
                 <tr>
-                    <td><b>E-mail</b>: mellow@gmail.com</td>
+                    <td><b>E-mail</b>: <?php echo $email; ?></td>
                 </tr>
-                
+
                 <tr>
-                    <td><b>Phone number</b>: 123456781234</td>
+                    <td><b>Phone number</b>: <?php echo $phone; ?></td>
                 </tr>
 
             </table>
@@ -105,19 +135,23 @@
             <table style="width: 25%;">
                 <tr>
                     <td><b>Crime Title</b>: </td>
-                    <td>House Robbery</td>
+                    <td><?php echo $title; ?></td>
                 </tr>
 
                 <tr>
                     <td><b>Date</b>: </td>
-                    <td>23/03/2024</td>
+                    <td><?php echo $date; ?></td>
                 </tr>
             </table>
-            <p style="margin-top: 17px; font-size: 18px;"><b>Crime Description:</b> Lorem,Lorem ipsum dolor sit amet consectetur adipisicing elit. Illo officia tenetur quidem quaerat earum, pariatur commodi rerum nisi necessitatibus quis eligendi iusto minima labore voluptas facere non numquam! Adipisci, assumenda! ipsum dolor sit amet consectetur adipisicing elit. Corporis aliquid fuga velit, facilis animi dolor ipsam tempore numquam recusandae praesentium nobis pariatur labore libero eos commodi ad quam ratione facere?</p>
-            <p style="margin-top: 17px; font-size: 18px;"><b>Other Information:</b> Lorem, ipsum dolor sit amet consectetur adipisicing elit. Corporis aliquid fuga velit, facilis animi dolor ipsam tempore numquam recusandae praesentium nobis pariatur labore libero eos commodi ad quam ratione facere?</p>
+            <p style="margin-top: 17px; font-size: 18px;"><b>Crime Description:</b> <?php echo $description; ?></p>
+            <p style="margin-top: 17px; font-size: 18px;"><b>Other Information:</b> <?php echo $information; ?></p>
         </div>
-        
+
     </section>
+    <script src="../assets/js/main.js"></script>
+    <div class="preloader-cont">
+        <div class="preloader"></div>
+    </div>
 </body>
 
 </html>

@@ -1,3 +1,7 @@
+<?php
+include "../php/connect.php";
+include "../php/token.php";
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,7 +14,7 @@
     <link rel="stylesheet" href="../assets/vendor/bootstrap-icons/bootstrap-icons.css">
 </head>
 
-<body style="overflow: hidden;">
+<body style="overflow: hidden;" onload="preloader()">
 
     <div class="main-container">
         <nav class="side-navigation">
@@ -37,43 +41,53 @@
                     <h3>All Users</h3>
                     <div class="inp-cont" style="width: 800px;">
                         <i class="bi bi-search"></i>
-                        <input type="search" placeholder="Search..." name="search" id="search">
+                        <input type="search" placeholder="Search..." onkeyup="search(this, document.querySelector('table'))" name="search" id="search">
                     </div>
                     <!-- <a class="btn" style="visibility: hidden;"> <i class="bi bi-plus-circle-fill"></i> New Survey </a> -->
                 </div>
 
                 <div class="cards">
+                    <!-- Fetching attendants details  -->
+                    <?php
+                    function analytics($location)
+                    {
+                        global $con;
+                        $location = strtolower($location);
+                        $fetch = mysqli_query($con, "SELECT * from users WHERE province='{$location}'");
 
+                        return mysqli_num_rows($fetch);
+                    }
+                    ?>
                     <div class="card">
                         <p class="dim">Kigali</p>
-                        <p class="value">1,200</p>
+                        <p class="value"><?php echo analytics('kigali') ?></p>
                     </div>
 
                     <div class="card">
                         <p class="dim">South</p>
-                        <p class="value">670</p>
+                        <p class="value"><?php echo analytics('southern') ?></p>
                     </div>
 
                     <div class="card">
                         <p class="dim">North</p>
-                        <p class="value">2,300</p>
+                        <p class="value"><?php echo analytics('Northern') ?></p>
                     </div>
 
                     <div class="card">
                         <p class="dim">East</p>
-                        <p class="value">890</p>
+                        <p class="value"><?php echo analytics('eastern') ?></p>
                     </div>
 
                     <div class="card">
                         <p class="dim">west</p>
-                        <p class="value">400</p>
+                        <p class="value"><?php echo analytics('western') ?></p>
                     </div>
 
                 </div>
 
                 <div class="filter-cont">
-                    <button class="filter-btn"> District <i class="bi bi-filter"></i></button>
-                    <button class="filter-btn"> Most recent <i class="bi bi-filter"></i></button>
+                    <button class="filter-btn" onclick="sort(document.querySelector('table'), 4)"> District <i class="bi bi-filter"></i></button>
+                    <button class="filter-btn" onclick="window.location.assign('./');"> Most recent <i class="bi bi-filter"></i></button>
                     <button class="filter-btn" style="visibility: hidden"> ---- ---- <i class="bi bi-filter"></i></button>
 
                     <!-- radio filters -->
@@ -81,12 +95,12 @@
                     <!-- spacings -->
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <!-- spacings -->
-                    <div class="inp-cont"><input type="radio" name="district" value="all" id="district"><label for="district">All</label></div>
-                    <div class="inp-cont"><input type="radio" name="district" value="kigali" id="district" checked><label for="district">Kigali</label></div>
-                    <div class="inp-cont"><input type="radio" name="district" value="south" id="district"><label for="district">South</label></div>
-                    <div class="inp-cont"><input type="radio" name="district" value="north" id="district"><label for="district">North</label></div>
-                    <div class="inp-cont"><input type="radio" name="district" value="east" id="district"><label for="district">East</label></div>
-                    <div class="inp-cont"><input type="radio" name="district" value="west" id="district"><label for="district">West</label></div>
+                    <div class="inp-cont"><input type="radio" name="district" onclick="filter(this.value, document.querySelector('table'))" value="all" id="district" checked><label for="district">All</label></div>
+                    <div class="inp-cont"><input type="radio" name="district" onclick="filter(this.value, document.querySelector('table'))" value="kigali" id="district"><label for="district">Kigali</label></div>
+                    <div class="inp-cont"><input type="radio" name="district" onclick="filter(this.value, document.querySelector('table'))" value="south" id="district"><label for="district">South</label></div>
+                    <div class="inp-cont"><input type="radio" name="district" onclick="filter(this.value, document.querySelector('table'))" value="north" id="district"><label for="district">North</label></div>
+                    <div class="inp-cont"><input type="radio" name="district" onclick="filter(this.value, document.querySelector('table'))" value="east" id="district"><label for="district">East</label></div>
+                    <div class="inp-cont"><input type="radio" name="district" onclick="filter(this.value, document.querySelector('table'))" value="west" id="district"><label for="district">West</label></div>
 
                 </div>
 
@@ -105,37 +119,30 @@
                         </thead>
 
                         <tbody>
+                            <?php
+                            $fetch = mysqli_query($con, "SELECT * FROM users");
 
-                            <tr>
-                                <td>1</td>
-                                <td>Mellow Junior</td>
-                                <td>0784146662</td>
-                                <td>0784146662</td>
-                                <td>Gasabo</td>
-                                <td>mellow@gmail.com</td>
-                                <td>120034653837472</td>
-                            </tr>
-
-                            <tr>
-                                <td>1</td>
-                                <td>Mellow Junior</td>
-                                <td>0784146662</td>
-                                <td>0784146662</td>
-                                <td>Gasabo</td>
-                                <td>mellow@gmail.com</td>
-                                <td>120034653837472</td>
-                            </tr>
-
-                            <tr>
-                                <td>1</td>
-                                <td>Mellow Junior</td>
-                                <td>0784146662</td>
-                                <td>0784146662</td>
-                                <td>Gasabo</td>
-                                <td>mellow@gmail.com</td>
-                                <td>120034653837472</td>
-                            </tr>
-
+                            if (mysqli_num_rows($fetch) > 0) {
+                                $count = 0;
+                                while ($row = mysqli_fetch_array($fetch)) {
+                            ?>
+                                    <tr>
+                                        <td><?php echo ++$count; ?></td>
+                                        <td><?php echo $row['fname'] . ' ' . $row['lname']; ?></td>
+                                        <td><?php echo $row['phone']; ?></td>
+                                        <td><?php echo $row['province']; ?></td>
+                                        <td><?php echo $row['district']; ?></td>
+                                        <td><?php echo $row['email']; ?></td>
+                                        <td><?php echo $row['nid']; ?></td>
+                                    </tr>
+                                <?php }
+                            } else { ?>
+                                <tr>
+                                    <td colspan="7" align="center">
+                                        No users registerd
+                                    </td>
+                                </tr>
+                            <?php } ?>
                         </tbody>
                     </table>
                 </div>
@@ -143,6 +150,9 @@
         </section>
     </div>
 
+    <div class="preloader-cont">
+        <div class="preloader"></div>
+    </div>
     <script src="../assets/js/main.js"></script>
 </body>
 

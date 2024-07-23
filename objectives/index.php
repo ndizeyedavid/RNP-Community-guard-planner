@@ -1,3 +1,7 @@
+<?php
+include "../php/connect.php";
+include "../php/token.php";
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,9 +12,23 @@
     <!-- <link rel="stylesheet" href="./assets/css/form.css"> -->
     <link rel="stylesheet" href="../assets/css/main.css">
     <link rel="stylesheet" href="../assets/vendor/bootstrap-icons/bootstrap-icons.css">
+    <style>
+        .loading-cont {
+            width: 100%;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading {
+            width: 80px;
+            height: 80px;
+        }
+    </style>
 </head>
 
-<body style="overflow: hidden;">
+<body style="overflow: hidden;" onload="preloader();">
 
     <div class="main-container">
         <nav class="side-navigation">
@@ -43,115 +61,52 @@
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <!-- spacings -->
                     <div style="display: flex; gap: 10px;">
-                        <div class="inp-cont"><input type="radio" name="district" value="all" id="district"><label for="district">All</label></div>
-                        <div class="inp-cont"><input type="radio" name="district" value="kigali" id="district" checked><label for="district">Kigali</label></div>
-                        <div class="inp-cont"><input type="radio" name="district" value="south" id="district"><label for="district">South</label></div>
-                        <div class="inp-cont"><input type="radio" name="district" value="north" id="district"><label for="district">North</label></div>
-                        <div class="inp-cont"><input type="radio" name="district" value="east" id="district"><label for="district">East</label></div>
-                        <div class="inp-cont"><input type="radio" name="district" value="west" id="district"><label for="district">West</label></div>
+                        <div class="inp-cont"><input type="radio" name="district" onclick="loadIt('all');" value="all" id="district" checked><label for="district">All</label></div>
+                        <div class="inp-cont"><input type="radio" name="district" onclick="loadIt('kigali');" value="kigali" id="district"><label for="district">Kigali</label></div>
+                        <div class="inp-cont"><input type="radio" name="district" onclick="loadIt('south');" value="south" id="district"><label for="district">South</label></div>
+                        <div class="inp-cont"><input type="radio" name="district" onclick="loadIt('north');" value="north" id="district"><label for="district">North</label></div>
+                        <div class="inp-cont"><input type="radio" name="district" onclick="loadIt('east');" value="east" id="district"><label for="district">East</label></div>
+                        <div class="inp-cont"><input type="radio" name="district" onclick="loadIt('west');" value="west" id="district"><label for="district">West</label></div>
+
                     </div>
 
                 </div>
 
                 <div class="top-cont">
-                    <h3>Northern Province</h3>
+                    <h3 style="text-transform: capitalize;"><b id="target">Northern</b> Province</h3>
 
                     <div class="analytics">
+                        <?php
+                        function analytics($table)
+                        {
+                            global $con;
+                            $data = mysqli_query($con, "SELECT * FROM $table");
+
+                            return mysqli_num_rows($data);
+                        }
+                        ?>
                         <div class="survey">
-                            <p>2,300 Surveys</p>
+                            <p><?php echo analytics("survey_attendants"); ?> Surveys</p>
                         </div>
                         <div class="crime">
-                            <p>1,240 Crimes</p>
+                            <p><?php echo analytics("crime_report"); ?> Crimes</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="cards" style="flex-wrap: wrap; gap: 26px;">
-
-                    <div class="card">
-                        <h3>Gicumbi</h3>
-
-                        <table>
-                            <tr>
-                                <td>Sectors</td>
-                                <td class="value">21</td>
-                            </tr>
-                            <tr>
-                                <td>Crimes</td>
-                                <td class="value">21</td>
-                            </tr>
-                            <tr>
-                                <td>Surveys</td>
-                                <td class="value">691</td>
-                            </tr>
-                        </table>
-                        <a href="view.php?id" class="btn"> View </a>
-                    </div>
-
-                    <div class="card">
-                        <h3>Musanze</h3>
-
-                        <table>
-                            <tr>
-                                <td>Sectors</td>
-                                <td class="value">21</td>
-                            </tr>
-                            <tr>
-                                <td>Crimes</td>
-                                <td class="value">21</td>
-                            </tr>
-                            <tr>
-                                <td>Surveys</td>
-                                <td class="value">691</td>
-                            </tr>
-                        </table>
-                        <a href="view.php?id" class="btn"> View </a>
-                    </div>
-
-                    <div class="card">
-                        <h3>Rulindo</h3>
-
-                        <table>
-                            <tr>
-                                <td>Sectors</td>
-                                <td class="value">21</td>
-                            </tr>
-                            <tr>
-                                <td>Crimes</td>
-                                <td class="value">21</td>
-                            </tr>
-                            <tr>
-                                <td>Surveys</td>
-                                <td class="value">691</td>
-                            </tr>
-                        </table>
-                        <a href="view.php?id" class="btn"> View </a>
-                    </div>
-
-                    <div class="card">
-                        <h3>Gakenke</h3>
-
-                        <table>
-                            <tr>
-                                <td>Sectors</td>
-                                <td class="value">21</td>
-                            </tr>
-                            <tr>
-                                <td>Crimes</td>
-                                <td class="value">21</td>
-                            </tr>
-                            <tr>
-                                <td>Surveys</td>
-                                <td class="value">691</td>
-                            </tr>
-                        </table>
-                        <a href="view.php?id" class="btn"> View </a>
+                <div class="cards" id="out" style="flex-wrap: wrap; gap: 26px;">
+                    <div class="loading-cont">
+                        <div class="loading"></div>
                     </div>
                 </div>
             </div>
         </section>
     </div>
 
+    <div class="preloader-cont">
+        <div class="preloader"></div>
+    </div>
+    <script src="../assets/js/rwanda.js"></script>
     <script src="../assets/js/main.js"></script>
 </body>
 

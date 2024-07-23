@@ -1,3 +1,18 @@
+<?php
+include "../php/connect.php";
+include "../php/token.php";
+function status($status)
+{
+    $status = strtolower($status);
+    if ($status == "pending") {
+        return '<span class="badge primary">Pending</span>';
+    } else if ($status == "complete") {
+        return '<span class="badge success">Complete</span>';
+    } else {
+        return '<span class="badge danger">Due reached</span>';
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,13 +23,16 @@
     <!-- <link rel="stylesheet" href="./assets/css/form.css"> -->
     <link rel="stylesheet" href="../assets/css/main.css">
     <link rel="stylesheet" href="../assets/vendor/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="../assets/vendor/sweetalert2/dist/sweetalert2.min.css">
     <style>
-        .inp-cont{
+        .inp-cont {
             display: flex;
             flex-direction: column;
             gap: 14px;
         }
-        input, textarea{
+
+        input,
+        textarea {
             width: 502px;
             height: 46px;
             border-radius: var(--border-sm);
@@ -22,13 +40,15 @@
             padding: 0 10px;
             outline: none;
         }
-        input:focus, textarea:focus{
+
+        input:focus,
+        textarea:focus {
             /* border-color: var(--primary); */
             box-shadow: 0 0 0px 3px rgb(97, 88, 206, 0.4);
 
-        }        
+        }
 
-        button[type='submit']{
+        button[type='submit'] {
             background: var(--primary);
             /* background: red; */
             font-size: 25px;
@@ -45,18 +65,22 @@
         }
 
 
-        button[type='submit']:hover{
+        button[type='submit']:hover {
             background: var(--secondary);
             cursor: pointer;
         }
-        button[type='submit']:focus{
+
+        button[type='submit']:focus {
             box-shadow: 0 0 0px 3px var(--secondary);
         }
-        
+
+        .inp-cont {
+            margin-top: 10px;
+        }
     </style>
 </head>
 
-<body style="overflow: hidden;">
+<body style="overflow: hidden;" onload="preloader()">
 
     <div class="main-container">
         <nav class="side-navigation">
@@ -83,25 +107,39 @@
                     <div class="top-cont">
                         <h3 class="title">Dashboard</h3>
                         <div class="cards" style="flex-wrap: nowrap;">
+
+                            <?php
+                            function analytics($status)
+                            {
+                                global $con;
+                                if (!empty($status)) {
+                                    $fetch = mysqli_query($con, "SELECT * FROM tasks WHERE status='{$status}'");
+                                } else {
+                                    $fetch = mysqli_query($con, "SELECT * FROM tasks");
+                                }
+
+                                return mysqli_num_rows($fetch);
+                            }
+                            ?>
                             <div class="card">
                                 <h3>Total Tasks</h3>
-                                <i class="bi bi-journal-check"></i>
-                                <p>50</p>
+                                <i class="bi bi-journal-text"></i>
+                                <p><?php echo analytics(''); ?></p>
                             </div>
                             <div class="card">
-                                <h3>Total Tasks</h3>
+                                <h3>Completed Tasks</h3>
                                 <i class="bi bi-journal-check"></i>
-                                <p>50</p>
+                                <p><?php echo analytics('complete'); ?></p>
                             </div>
                             <div class="card">
-                                <h3>Total Tasks</h3>
-                                <i class="bi bi-journal-check"></i>
-                                <p>50</p>
+                                <h3>Pending Tasks</h3>
+                                <i class="bi bi-stopwatch"></i>
+                                <p><?php echo analytics('pending'); ?></p>
                             </div>
                             <div class="card">
-                                <h3>Total Tasks</h3>
-                                <i class="bi bi-journal-check"></i>
-                                <p>50</p>
+                                <h3>Due Tasks</h3>
+                                <i class="bi bi-hourglass-split"></i>
+                                <p><?php echo analytics('due'); ?></p>
                             </div>
                         </div>
                     </div>
@@ -110,8 +148,8 @@
                         <div class="filter-cont">
                             <h3>All Tasks</h3>
                             <div class="filter-opt">
-                                <input type="search" placeholder="Search...." id="search">
-                                <button class="filter-btn"> <i class="bi bi-filter"></i> Status</button>
+                                <input type="search" placeholder="Search...." onkeyup="search(this, document.querySelector('table'))" id="search">
+                                <button class="filter-btn" onclick="sort(document.querySelector('table'), 2)"> <i class="bi bi-filter"></i> Status</button>
                             </div>
                         </div>
 
@@ -129,22 +167,27 @@
                                 </thead>
 
                                 <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>Making money</td>
-                                        <td><span class="badge success">Complete</span></td>
-                                        <td>DP Mellow</td>
-                                        <td>03/2/2024</td>
-                                        <td><a href=""><i class="bi bi-box-arrow-up-right"></i></a></td>
-                                    </tr>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>Making money</td>
-                                        <td><span class="badge primary">Pending</span></td>
-                                        <td>DP Mellow</td>
-                                        <td>03/2/2024</td>
-                                        <td><a href=""><i class="bi bi-box-arrow-up-right"></i></a></td>
-                                    </tr>
+                                    <?php
+                                    $fetch = mysqli_query($con, "SELECT * FROM tasks");
+                                    if (mysqli_num_rows($fetch) > 0) {
+                                        $count = 0;
+                                        while ($row = mysqli_fetch_array($fetch)) {
+                                    ?>
+                                            <tr>
+                                                <td><?php echo ++$count; ?></td>
+                                                <td><?php echo $row['taskName']; ?></td>
+                                                <td><?php echo status($row['status']); ?></td>
+                                                <td><?php echo $row['assigned']; ?></td>
+                                                <td><?php echo $row['dueDate'] ?></td>
+                                                <td><a href="#"><i class="bi bi-box-arrow-up-right"></i></a></td>
+                                            </tr>
+                                        <?php }
+                                    } else { ?>
+                                        <tr>
+                                            <td colspan="6" align="center">No Tasks created</td>
+                                        </tr>
+                                    <?php } ?>
+
                                 </tbody>
                             </table>
                         </div>
@@ -156,30 +199,42 @@
 
                     <div class="summary">
                         <div class="top-cont">
-                            <h3>Recent Tasks</h3>
-                            <p>Thur, 09 May 2024</p>
+                            <h3>Tasks Due Today</h3>
+                            <p><?php echo date("D, d M Y") ?></p>
                         </div>
 
                         <div class="sum-cont">
 
-                            <div class="badge success">
-                                <div class="details">
-                                    <h3>Patrol Scheduling</h3>
-                                    <p>Patrol scheduling officer</p>
-                                    <span class="success" style="color:#079204;">Completed</span>
-                                </div>
-                                <a href=""><i class="bi bi-box-arrow-up-right"></i></a>
-                            </div>
+                            <?php
+                            $today = date("Y-m-d");
+                            $t_fetch = mysqli_query($con, "SELECT * FROM tasks WHERE dueDate = '{$today}'");
+                            function t_status($status)
+                            {
 
-                            <div class="badge primary">
-                                <div class="details">
-                                    <h3>Patrol Scheduling</h3>
-                                    <p>Patrol scheduling officer</p>
-                                    <span class="primary" style="color:#0B008D;">Pending</span>
-                                </div>
-                                <a href=""><i class="bi bi-box-arrow-up-right"></i></a>
-                            </div>
+                                if ($status == 'pending') {
+                                    echo "primary";
+                                } else if ($status == "complete") {
+                                    echo "success";
+                                } else {
+                                    echo "danger";
+                                }
+                            }
+                            if (mysqli_num_rows($t_fetch) > 0) {
+                                while ($row = mysqli_fetch_array($t_fetch)) {
+                            ?>
 
+                                    <div class="badge <?php t_status($row['status']); ?>">
+                                        <div class="details">
+                                            <h3><?php echo $row['taskName'] ?></h3>
+                                            <p><?php echo $row['assigned'] ?></p>
+                                            <span class="success" style="color:#000;"><?php echo $row['status'] ?></span>
+                                        </div>
+                                        <a href=""><i class="bi bi-box-arrow-up-right"></i></a>
+                                    </div>
+                                <?php }
+                            } else { ?>
+                                <p class="dim" align="center" style="margin-top: 90px;">No tasks due today</p>
+                            <?php } ?>
                         </div>
                     </div>
                 </div>
@@ -192,36 +247,47 @@
             <h3>Add New Task</h3>
             <a href="javascript:void(0);" onclick="document.querySelector('.modal-container').style.display='none';" style="color: var(--danger); position: absolute; right: 30px; font-size: 30px;"><i class="bi bi-x-lg"></i></a>
 
-            <form action="#" style="margin-top: 30px;">
+            <form method="POST" action="./php/new.php" style="margin-top: 30px;">
 
                 <div class="inp-cont">
                     <label for="task">Task</label>
-                    <input type="text" name="task">
+                    <input type="text" name="task" required>
                 </div>
 
                 <div class="inp-cont">
                     <label for="task">Task Description</label>
-                    <input type="text" name="description">
+                    <input type="text" name="description" required>
                 </div>
 
                 <div class="inp-cont">
                     <label for="assigned">Assigned to</label>
-                    <input type="text" name="assigned">
+                    <input type="text" name="assigned" required>
                 </div>
 
                 <div class="inp-cont">
-                    <label for="date">Date</label>
-                    <input type="date" name="date">
+                    <label for="date">Due Date</label>
+                    <input type="date" name="date" required>
                 </div>
 
                 <div class="inp-cont">
                     <button type="submit" name="submit">Submit</button>
                 </div>
-                
+
             </form>
         </div>
     </div>
+    <div class="preloader-cont">
+        <div class="preloader"></div>
+    </div>
+    <script src="../assets/vendor/sweetalert2/dist/sweetalert2.min.js"></script>
     <script src="../assets/js/main.js"></script>
+    <script>
+        <?php if (isset($_GET['succ'])) { ?>
+            throwNotif("Task assigned successfuly", "success");
+        <?php } else if ($_GET['err']) { ?>
+            throwNotif("Operation Failed", "error");
+        <?php } ?>
+    </script>
 </body>
 
 </html>
