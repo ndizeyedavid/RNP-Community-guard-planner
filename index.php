@@ -14,7 +14,7 @@ include "./php/token.php"
     <link rel="stylesheet" href="./assets/vendor/bootstrap-icons/bootstrap-icons.css">
 </head>
 
-<body style="overflow: hidden;">
+<body style="overflow: hidden;" onload="preloader()">
 
     <div class="main-container">
         <nav class="side-navigation">
@@ -86,6 +86,9 @@ include "./php/token.php"
         </section>
     </div>
 
+    <div class="preloader-cont">
+        <div class="preloader"></div>
+    </div>
     <script src="./assets/js/main.js"></script>
 </body>
 

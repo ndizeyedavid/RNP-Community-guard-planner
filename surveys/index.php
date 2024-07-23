@@ -1,3 +1,7 @@
+<?php
+include "../php/connect.php";
+include "../php/token.php";
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,6 +12,7 @@
     <!-- <link rel="stylesheet" href="./assets/css/form.css"> -->
     <link rel="stylesheet" href="../assets/css/main.css">
     <link rel="stylesheet" href="../assets/vendor/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="../assets/vendor/sweetalert2/dist/sweetalert2.min.css">
 </head>
 
 <body style="overflow: hidden;">
@@ -144,7 +149,15 @@
         </section>
     </div>
 
+    <script src="../assets/vendor/sweetalert2/dist/sweetalert2.min.js"></script>
     <script src="../assets/js/main.js"></script>
+    <script>
+        <?php if (isset($_GET['succ'])) { ?>
+            throwNotif("Survey Created", "success");
+        <?php } else if ($_GET['err']) { ?>
+            throwNotif("Operation Failed", "error");
+        <?php } ?>
+    </script>
 </body>
 
 </html>

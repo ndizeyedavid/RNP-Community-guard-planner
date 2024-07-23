@@ -13,3 +13,15 @@ modal_container.onclick = (e) =>{
         console.log('Nah');
     }
 }
+
+function preloader(){
+    var preloader = document.querySelector('.preloader-cont');
+    preloader.style.display = "none";
+}
+
+function throwNotif(cont, type){
+    Swal.fire({
+        title: `${cont}`,
+        type: `${type}`
+    })
+}
