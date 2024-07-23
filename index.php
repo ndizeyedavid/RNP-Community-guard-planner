@@ -1,3 +1,7 @@
+<?php
+include "./php/connect.php";
+include "./php/token.php"
+?>
 <!DOCTYPE html>
 <html lang="en">
 
